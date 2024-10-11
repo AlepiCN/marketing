@@ -14,5 +14,10 @@
     <select id="getStrategyList" resultMap="dataMap">
         select * from strategy
     </select>
+    <select id="queryStrategyByStrategyId" resultType="com.alepi.infrastructure.persistent.po.Strategy" resultMap="dataMap">
+        select strategy_id, strategy_desc, rule_models
+        from strategy
+        where strategy_id = #{strategyId}
+    </select>
 
 </mapper>

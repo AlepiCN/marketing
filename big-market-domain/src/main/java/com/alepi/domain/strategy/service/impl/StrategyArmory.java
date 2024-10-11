@@ -1,8 +1,13 @@
 package com.alepi.domain.strategy.service.impl;
 
 import com.alepi.domain.strategy.model.entity.StrategyAwardEntity;
+import com.alepi.domain.strategy.model.entity.StrategyEntity;
+import com.alepi.domain.strategy.model.entity.StrategyRuleEntity;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
 import com.alepi.domain.strategy.service.IStrategyArmory;
+import com.alepi.domain.strategy.service.IStrategyDispatch;
+import com.alepi.types.enums.ResponseCode;
+import com.alepi.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,23 +16,49 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class StrategyArmory implements IStrategyArmory {
+public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
 
     @Resource
     private IStrategyRepository strategyRepository;
 
     @Override
-    public void assembleLotteryStrategy(Long strategyId) {
+    public boolean assembleLotteryStrategy(Long strategyId) {
         List<StrategyAwardEntity> strategyAwardEntities = strategyRepository.queryStrategyAwardList(strategyId);
 
+        assembleLotteryStrategy(String.valueOf(strategyId), strategyAwardEntities);
+
+        StrategyEntity strategy = strategyRepository.queryStrategyEntityByStrategyId(strategyId);
+
+        String ruleWeight = strategy.getRuleWeight();
+
+        if (ruleWeight == null) return true;
+
+        StrategyRuleEntity strategyRuleEntity = strategyRepository.queryStrategyRuleEntity(strategyId, ruleWeight);
+
+        if (strategyRuleEntity == null) {
+            throw new AppException(ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getCode(), ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getInfo());
+        }
+
+        Map<String, List<Integer>> ruleWeightValuesMap = strategyRuleEntity.getRuleWeightValues();
+
+        Set<String> keys = ruleWeightValuesMap.keySet();
+        for (String key : keys) {
+            List<Integer> ruleWeightValues = ruleWeightValuesMap.get(key);
+            ArrayList<StrategyAwardEntity> strategyAwardEntitiesClone = new ArrayList<>(strategyAwardEntities);
+            strategyAwardEntitiesClone.removeIf(strategyAwardEntity -> !ruleWeightValues.contains(strategyAwardEntity.getAwardId()));
+            // 装载权重规则的策略
+            assembleLotteryStrategy(String.valueOf(strategyId).concat("_").concat(key), strategyAwardEntitiesClone);
+        }
+
+        return true;
+    }
+
+    private void assembleLotteryStrategy(String key, List<StrategyAwardEntity> strategyAwardEntities) {
         BigDecimal rateScale = strategyAwardEntities.stream()
                 .map(StrategyAwardEntity::getAwardRate)
                 .min(BigDecimal::compareTo)
@@ -85,13 +116,20 @@ public class StrategyArmory implements IStrategyArmory {
             awardMap.put(i, allAwardList.get(i));
         }
 
-        strategyRepository.storageStrategyAwardSearchRateTables(strategyId, rateRange, awardMap);
-
+        strategyRepository.storageStrategyAwardSearchRateTables(key, rateRange, awardMap);
     }
 
     @Override
     public Integer getRandomAwardId(Long strategyId) {
-        int rateRange = strategyRepository.getRateRange(strategyId);
+        // 分布式部署下，不一定为当前应用做的策略装配。也就是值不一定会保存到本应用，而是分布式应用，所以需要从 Redis 中获取
+        int rateRange = strategyRepository.getRateRange(String.valueOf(strategyId));
+        // 通过生成的随机值，获取该策略下的奖品ID
+        return strategyRepository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
+    }
+
+    @Override
+    public Integer getRandomAwardId(Long strategyId, String ruleWeightValue) {
+        int rateRange = strategyRepository.getRateRange(String.valueOf(strategyId).concat("_").concat(ruleWeightValue));
         return strategyRepository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
     }
 }

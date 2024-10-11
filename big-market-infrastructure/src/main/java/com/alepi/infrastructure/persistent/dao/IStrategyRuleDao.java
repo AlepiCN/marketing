@@ -8,4 +8,6 @@ import java.util.List;
 @Mapper
 public interface IStrategyRuleDao {
     List<StrategyRule> getStrategyRuleList();
+
+    StrategyRule queryStrategyRule(Long strategyId, String ruleModel);
 }
