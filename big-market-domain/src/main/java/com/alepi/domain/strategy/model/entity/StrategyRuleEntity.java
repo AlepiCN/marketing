@@ -24,7 +24,7 @@ public class StrategyRuleEntity {
     private Integer ruleType;
     // 抽奖规则【rule_random-随机值计算、rule_lock-抽奖几次后解锁、rule_luck_award-兜底奖品、rule_weight-抽奖奖品权重】
     private String ruleModel;
-    // 抽奖规则比值
+    // 抽奖规则对应值
     private String ruleValue;
     // 抽奖规则描述
     private String ruleDesc;
