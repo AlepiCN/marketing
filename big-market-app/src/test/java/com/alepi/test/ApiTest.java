@@ -1,7 +1,7 @@
 package com.alepi.test;
 
-import com.alepi.domain.strategy.service.IStrategyArmory;
-import com.alepi.domain.strategy.service.IStrategyDispatch;
+import com.alepi.domain.strategy.service.armory.IStrategyArmory;
+import com.alepi.domain.strategy.service.armory.IStrategyDispatch;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;

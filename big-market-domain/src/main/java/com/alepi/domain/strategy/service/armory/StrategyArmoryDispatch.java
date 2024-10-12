@@ -1,11 +1,9 @@
-package com.alepi.domain.strategy.service.impl;
+package com.alepi.domain.strategy.service.armory;
 
 import com.alepi.domain.strategy.model.entity.StrategyAwardEntity;
 import com.alepi.domain.strategy.model.entity.StrategyEntity;
 import com.alepi.domain.strategy.model.entity.StrategyRuleEntity;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
-import com.alepi.domain.strategy.service.IStrategyArmory;
-import com.alepi.domain.strategy.service.IStrategyDispatch;
 import com.alepi.types.enums.ResponseCode;
 import com.alepi.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;

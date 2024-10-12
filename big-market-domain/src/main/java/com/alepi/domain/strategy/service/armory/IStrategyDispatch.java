@@ -1,4 +1,4 @@
-package com.alepi.domain.strategy.service;
+package com.alepi.domain.strategy.service.armory;
 
 /**
  * 抽奖策略调度
