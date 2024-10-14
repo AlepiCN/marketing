@@ -1,4 +1,4 @@
-package com.alepi.domain.strategy.model.vo;
+package com.alepi.domain.strategy.model.valobj;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

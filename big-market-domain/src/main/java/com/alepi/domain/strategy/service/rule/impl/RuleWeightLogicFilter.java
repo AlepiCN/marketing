@@ -2,7 +2,7 @@ package com.alepi.domain.strategy.service.rule.impl;
 
 import com.alepi.domain.strategy.model.entity.RuleActionEntity;
 import com.alepi.domain.strategy.model.entity.RuleMatterEntity;
-import com.alepi.domain.strategy.model.vo.RuleLogicCheckTypeVO;
+import com.alepi.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
 import com.alepi.domain.strategy.service.annotation.LogicStrategy;
 import com.alepi.domain.strategy.service.rule.factory.DefaultLogicFactory;

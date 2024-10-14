@@ -1,6 +1,6 @@
 package com.alepi.domain.strategy.model.entity;
 
-import com.alepi.domain.strategy.model.vo.RuleLogicCheckTypeVO;
+import com.alepi.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import lombok.*;
 
 /**

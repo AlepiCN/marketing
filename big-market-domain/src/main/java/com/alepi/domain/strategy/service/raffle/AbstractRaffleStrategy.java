@@ -4,7 +4,8 @@ import com.alepi.domain.strategy.model.entity.RaffleAwardEntity;
 import com.alepi.domain.strategy.model.entity.RaffleFactorEntity;
 import com.alepi.domain.strategy.model.entity.RuleActionEntity;
 import com.alepi.domain.strategy.model.entity.StrategyEntity;
-import com.alepi.domain.strategy.model.vo.RuleLogicCheckTypeVO;
+import com.alepi.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
+import com.alepi.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
 import com.alepi.domain.strategy.service.armory.IStrategyDispatch;
 import com.alepi.domain.strategy.service.rule.factory.DefaultLogicFactory;
@@ -62,10 +63,28 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy{
 
         Integer randomAwardId = strategyDispatch.getRandomAwardId(strategyId);
 
+        // 抽奖中规则过滤
+        StrategyAwardRuleModelVO strategyAwardRuleModelVO = strategyRepository.queryStrategyAwardRuleModel(strategyId, randomAwardId);
+        RuleActionEntity<RuleActionEntity.RafflingEntity> rafflingEntityRuleActionEntity = this.doCheckLogicInRaffling(RaffleFactorEntity.builder()
+                .awardId(randomAwardId)
+                .strategyId(raffleFactorEntity.getStrategyId())
+                .userId(raffleFactorEntity.getUserId())
+                .build(), strategyAwardRuleModelVO.raffleCenterRuleModelList());
+
+        if (rafflingEntityRuleActionEntity != null && RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(rafflingEntityRuleActionEntity.getCode())) {
+            log.info("【临时日志】中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。");
+            return RaffleAwardEntity.builder()
+                    .awardDesc("中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。")
+                    .build();
+        }
+
         return RaffleAwardEntity.builder()
                 .awardId(randomAwardId)
                 .build();
     }
 
     protected abstract RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> doCheckLogicBeforeRaffle(RaffleFactorEntity build, String... logic);
+
+    protected abstract RuleActionEntity<RuleActionEntity.RafflingEntity> doCheckLogicInRaffling(RaffleFactorEntity build, String... logic);
+
 }

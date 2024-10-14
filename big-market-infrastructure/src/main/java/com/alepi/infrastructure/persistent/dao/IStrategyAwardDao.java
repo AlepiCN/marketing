@@ -9,4 +9,6 @@ import java.util.List;
 public interface IStrategyAwardDao {
 
     List<StrategyAward> getStrategyAwardListByStrategyId(Long strategyId);
+
+    String queryStrategyAwardRuleModels(Long strategyId, Integer awardId);
 }

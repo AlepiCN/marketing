@@ -3,6 +3,7 @@ package com.alepi.infrastructure.persistent.repository;
 import com.alepi.domain.strategy.model.entity.StrategyAwardEntity;
 import com.alepi.domain.strategy.model.entity.StrategyEntity;
 import com.alepi.domain.strategy.model.entity.StrategyRuleEntity;
+import com.alepi.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
 import com.alepi.infrastructure.persistent.dao.IStrategyAwardDao;
 import com.alepi.infrastructure.persistent.dao.IStrategyDao;
@@ -112,5 +113,11 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel) {
         return strategyRuleDao.queryStrategyRuleValue(strategyId, awardId, ruleModel);
+    }
+
+    @Override
+    public StrategyAwardRuleModelVO queryStrategyAwardRuleModel(Long strategyId, Integer awardId) {
+        String ruleModels = strategyAwardDao.queryStrategyAwardRuleModels(strategyId, awardId);
+        return StrategyAwardRuleModelVO.builder().ruleModels(ruleModels).build();
     }
 }
