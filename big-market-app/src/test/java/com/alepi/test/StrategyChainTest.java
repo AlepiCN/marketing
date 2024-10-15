@@ -2,10 +2,11 @@ package com.alepi.test;
 
 import com.alepi.domain.strategy.model.entity.RaffleAwardEntity;
 import com.alepi.domain.strategy.model.entity.RaffleFactorEntity;
-import com.alepi.domain.strategy.service.armory.IStrategyArmory;
-import com.alepi.domain.strategy.service.armory.IStrategyDispatch;
 import com.alepi.domain.strategy.service.IRaffleStrategy;
+import com.alepi.domain.strategy.service.armory.IStrategyArmory;
+import com.alepi.domain.strategy.service.rule.chain.ILogicChain;
 import com.alepi.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
+import com.alepi.domain.strategy.service.rule.chain.impl.RuleWeightLogicChain;
 import com.alepi.domain.strategy.service.rule.filter.impl.RuleLockLogicFilter;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -21,19 +22,22 @@ import javax.annotation.Resource;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class StrategyFilterTest {
-
-    @Resource
-    private IStrategyDispatch strategyDispatch;
+public class StrategyChainTest {
 
     @Resource
     private IStrategyArmory strategyArmory;
 
     @Resource
+    private RuleLockLogicFilter ruleLockLogicFilter;
+
+    @Resource
     private IRaffleStrategy raffleStrategy;
 
     @Resource
-    private RuleLockLogicFilter ruleLockLogicFilter;
+    private RuleWeightLogicChain ruleWeightLogicChain;
+
+    @Resource
+    private DefaultChainFactory defaultChainFactory;
 
     @Before
     public void test_strategyArmory() {
@@ -42,6 +46,7 @@ public class StrategyFilterTest {
         log.info("测试结果：{}", strategyArmory.assembleLotteryStrategy(100003L));
 
         ReflectionTestUtils.setField(ruleLockLogicFilter, "userRaffleTimes", 0L);
+        ReflectionTestUtils.setField(ruleWeightLogicChain, "userLevel", 5000L);
     }
 
     @Test
@@ -55,22 +60,25 @@ public class StrategyFilterTest {
     }
 
     @Test
-    public void test_performRaffle_blackList() {
-        RaffleFactorEntity raffleFactorEntity = RaffleFactorEntity.builder().userId("user003").strategyId(100001L).build();
-
-        RaffleAwardEntity raffleAwardEntity = raffleStrategy.performRaffle(raffleFactorEntity);
-
-        log.info("请求参数:{}", JSON.toJSONString(raffleFactorEntity));
-        log.info("测试结果:{}", JSON.toJSONString(raffleAwardEntity));
+    public void test_LogicChain_rule_blacklist() {
+        ILogicChain logicChain = defaultChainFactory.openLogicChain(100001L);
+        Integer awardId = logicChain.logic("user001", 100001L);
+        log.info("测试结果：{}", awardId);
     }
 
     @Test
-    public void test_performRaffle_center() {
-        RaffleFactorEntity raffleFactorEntity = RaffleFactorEntity.builder().userId("user003").strategyId(100003L).build();
+    public void test_LogicChain_rule_weight() {
+        // 通过反射 mock 规则中的值
+        ReflectionTestUtils.setField(ruleWeightLogicChain, "userLevel", 4900L);
+        ILogicChain logicChain = defaultChainFactory.openLogicChain(100001L);
+        Integer awardId = logicChain.logic("xiaofuge", 100001L);
+        log.info("测试结果：{}", awardId);
+    }
 
-        RaffleAwardEntity raffleAwardEntity = raffleStrategy.performRaffle(raffleFactorEntity);
-
-        log.info("请求参数:{}", JSON.toJSONString(raffleFactorEntity));
-        log.info("测试结果:{}", JSON.toJSONString(raffleAwardEntity));
+    @Test
+    public void test_LogicChain_rule_default() {
+        ILogicChain logicChain = defaultChainFactory.openLogicChain(100001L);
+        Integer awardId = logicChain.logic("xiaofuge", 100001L);
+        log.info("测试结果：{}", awardId);
     }
 }

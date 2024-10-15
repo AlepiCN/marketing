@@ -111,6 +111,11 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
+    public String queryStrategyRuleValue(Long strategyId, String ruleModel) {
+        return strategyRuleDao.queryStrategyRuleValue(strategyId, null, ruleModel);
+    }
+
+    @Override
     public String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel) {
         return strategyRuleDao.queryStrategyRuleValue(strategyId, awardId, ruleModel);
     }

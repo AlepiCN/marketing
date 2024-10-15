@@ -1,4 +1,4 @@
-package com.alepi.domain.strategy.service.rule.impl;
+package com.alepi.domain.strategy.service.rule.filter.impl;
 
 import com.alepi.domain.strategy.model.entity.RuleActionEntity;
 import com.alepi.domain.strategy.model.entity.RuleMatterEntity;

@@ -5,9 +5,11 @@ import com.alepi.domain.strategy.model.entity.RuleActionEntity;
 import com.alepi.domain.strategy.model.entity.RuleMatterEntity;
 import com.alepi.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
+import com.alepi.domain.strategy.service.AbstractRaffleStrategy;
 import com.alepi.domain.strategy.service.armory.IStrategyDispatch;
-import com.alepi.domain.strategy.service.rule.impl.ILogicFilter;
-import com.alepi.domain.strategy.service.rule.factory.DefaultLogicFactory;
+import com.alepi.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
+import com.alepi.domain.strategy.service.rule.filter.impl.ILogicFilter;
+import com.alepi.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -25,8 +27,8 @@ public class DefaultRaffleStrategy extends AbstractRaffleStrategy {
     @Resource
     private DefaultLogicFactory logicFactory;
 
-    public DefaultRaffleStrategy(IStrategyRepository strategyRepository, IStrategyDispatch strategyDispatch) {
-        super(strategyRepository, strategyDispatch);
+    public DefaultRaffleStrategy(IStrategyRepository strategyRepository, IStrategyDispatch strategyDispatch, DefaultChainFactory defaultChainFactory) {
+        super(strategyRepository, strategyDispatch, defaultChainFactory);
     }
 
     @Override

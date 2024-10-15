@@ -1,8 +1,8 @@
-package com.alepi.domain.strategy.service.rule.factory;
+package com.alepi.domain.strategy.service.rule.filter.factory;
 
 import com.alepi.domain.strategy.model.entity.RuleActionEntity;
 import com.alepi.domain.strategy.service.annotation.LogicStrategy;
-import com.alepi.domain.strategy.service.rule.impl.ILogicFilter;
+import com.alepi.domain.strategy.service.rule.filter.impl.ILogicFilter;
 import com.alibaba.fastjson2.util.AnnotationUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

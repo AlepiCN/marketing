@@ -1,4 +1,4 @@
-package com.alepi.domain.strategy.service.raffle;
+package com.alepi.domain.strategy.service;
 
 import com.alepi.domain.strategy.model.entity.RaffleAwardEntity;
 import com.alepi.domain.strategy.model.entity.RaffleFactorEntity;

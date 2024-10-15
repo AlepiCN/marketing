@@ -1,6 +1,6 @@
 package com.alepi.domain.strategy.model.valobj;
 
-import com.alepi.domain.strategy.service.rule.factory.DefaultLogicFactory;
+import com.alepi.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
 import com.alepi.types.common.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

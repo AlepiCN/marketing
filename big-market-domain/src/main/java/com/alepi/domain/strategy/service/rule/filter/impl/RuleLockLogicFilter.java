@@ -1,11 +1,11 @@
-package com.alepi.domain.strategy.service.rule.impl;
+package com.alepi.domain.strategy.service.rule.filter.impl;
 
 import com.alepi.domain.strategy.model.entity.RuleActionEntity;
 import com.alepi.domain.strategy.model.entity.RuleMatterEntity;
 import com.alepi.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
 import com.alepi.domain.strategy.service.annotation.LogicStrategy;
-import com.alepi.domain.strategy.service.rule.factory.DefaultLogicFactory;
+import com.alepi.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
