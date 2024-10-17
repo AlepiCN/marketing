@@ -3,6 +3,7 @@ package com.alepi.domain.strategy.repository;
 import com.alepi.domain.strategy.model.entity.StrategyAwardEntity;
 import com.alepi.domain.strategy.model.entity.StrategyEntity;
 import com.alepi.domain.strategy.model.entity.StrategyRuleEntity;
+import com.alepi.domain.strategy.model.valobj.RuleTreeVO;
 import com.alepi.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 
 import java.util.HashMap;
@@ -27,4 +28,6 @@ public interface IStrategyRepository {
     String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel);
 
     StrategyAwardRuleModelVO queryStrategyAwardRuleModel(Long strategyId, Integer awardId);
+
+    RuleTreeVO queryRuleTreeVOByTreeId(String treeId);
 }
