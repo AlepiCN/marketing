@@ -69,64 +69,83 @@
 ```
 
 1. 创建型接口，用于链接责任链节点
-```java
-   public interface ILogicChainArmory {
-   
-       ILogicChain appendNext(ILogicChain next);
-   
-       ILogicChain next();
-   }
-```
+   ```java
+      public interface ILogicChainArmory {
+      
+          ILogicChain appendNext(ILogicChain next);
+      
+          ILogicChain next();
+      }
+   ```
 2. 规则实现接口
-```java
-   public interface ILogicChain extends ILogicChainArmory {
-   
-       /**
-        * 责任链接口
-        * @param userId 用户ID
-        * @param strategyId 策略ID
-        * @return 奖品ID
-        */
-       Integer logic(String userId, Long strategyId);
-   
-   
-   }
-```
+   ```java
+      public interface ILogicChain extends ILogicChainArmory {
+      
+          /**
+           * 责任链接口
+           * @param userId 用户ID
+           * @param strategyId 策略ID
+           * @return 奖品ID
+           */
+          Integer logic(String userId, Long strategyId);
+      
+      
+      }
+   ```
 3. 责任链工厂
-```java
-   public class DefaultChainFactory {
-      
-       private final Map<String, ILogicChain> logicChainGroup;
-      
-       private IStrategyRepository strategyRepository;
-      
-       public DefaultChainFactory(IStrategyRepository strategyRepository, Map<String, ILogicChain> logicChainGroup) {
-           this.logicChainGroup = logicChainGroup;
-           this.strategyRepository = strategyRepository;
-       }
-      
-       public ILogicChain openLogicChain(Long strategyId) {
-           StrategyEntity strategyEntity = strategyRepository.queryStrategyEntityByStrategyId(strategyId);
-           String[] ruleModels = strategyEntity.getRuleModels();
-      
-           if (ruleModels == null || ruleModels.length == 0) {
-               return logicChainGroup.get("default");
-           }
-      
-           ILogicChain logicChain = logicChainGroup.get(ruleModels[0]);
-           ILogicChain current = logicChain;
-      
-           for (int i = 1; i < ruleModels.length; i++) {
-               current = current.appendNext(logicChainGroup.get(ruleModels[i]));
-           }
-      
-           current.appendNext(logicChainGroup.get("default"));
-      
-           return logicChain;
-       }
-   }
-```
+   ```java
+      public class DefaultChainFactory {
+         
+          private final Map<String, ILogicChain> logicChainGroup;
+         
+          private IStrategyRepository strategyRepository;
+         
+          public DefaultChainFactory(IStrategyRepository strategyRepository, Map<String, ILogicChain> logicChainGroup) {
+              this.logicChainGroup = logicChainGroup;
+              this.strategyRepository = strategyRepository;
+          }
+         
+          public ILogicChain openLogicChain(Long strategyId) {
+              StrategyEntity strategyEntity = strategyRepository.queryStrategyEntityByStrategyId(strategyId);
+              String[] ruleModels = strategyEntity.getRuleModels();
+         
+              if (ruleModels == null || ruleModels.length == 0) {
+                  return logicChainGroup.get("default");
+              }
+         
+              ILogicChain logicChain = logicChainGroup.get(ruleModels[0]);
+              ILogicChain current = logicChain;
+         
+              for (int i = 1; i < ruleModels.length; i++) {
+                  current = current.appendNext(logicChainGroup.get(ruleModels[i]));
+              }
+         
+              current.appendNext(logicChainGroup.get("default"));
+         
+              return logicChain;
+          }
+      }
+   ```
    1. 通过构造器注入策略仓储，以及规则链的实现类Map
    2. 规则类的实现类Map由Spring自动装载：Spring会将一个接口的实现类自动组装成一个Map<name, impl>并管理起来
    3. openLogicChain(Long strategyId)方法根据仓储查询出来的ruleModels，获取规则列表并组装对应的规则链
 4. 抽奖前规则和抽奖中的规则不同，所以其处理也不同，并不能直接兼容进规则链，待后续处理。
+
+### 20241017
+#### 规则树实现
+1. 整体思路
+   抽奖中规则的走向和抽奖前规则不同，抽奖前规则是对抽奖策略整体的处理，而抽奖中规则是对奖品的处理；
+   抽奖前规则可以链式执行，判断执行其中的某一个规则；
+   抽奖中规则不可以链式执行，而需要根据奖品的规则来执行不同的链路；
+   抽奖前规则本质上是`抽奖规则`，抽奖中规则本质上是`奖品规则`；
+   当然这么理解是因为现有模型如此，如果出现别的规则可能又有一种新的规则实现。
+2. Factory类的实现
+   1. 注入接口实现类Map，如
+      > 规则类的实现类Map由Spring自动装载：Spring会将一个接口的实现类自动组装成一个Map<name, impl>并管理起来
+   2. 根据需要将数据装载起来
+      > 在Filter中，通过自定义注解@LogicModel扫描，获取所有的实现类并装载成Map
+      > 在Chain中，通过数据库策略规则字段，获取所有策略规则并组装成责任链
+      > 在Tree中，通过数据库规则树数据（树、节点、连线）组装规则树，通过Engine执行
+   3. 内部类
+      > 工厂创建的实现类执行的方法所返回的对象
+      > 工厂创建的实现类所需要的枚举类
