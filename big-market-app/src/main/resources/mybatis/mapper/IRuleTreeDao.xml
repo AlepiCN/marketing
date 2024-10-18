@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.alepi.infrastructure.persistent.dao.IRuleTreeDao">
-    <select id="queryRuleTreeByTreeId" resultType="com.alepi.infrastructure.persistent.po.RuleTree">
+    <resultMap id="dataMap" type="com.alepi.infrastructure.persistent.po.RuleTree">
+        <id column="id" property="id"/>
+        <result column="tree_id" property="treeId"/>
+        <result column="tree_name" property="treeName"/>
+        <result column="tree_desc" property="treeDesc"/>
+        <result column="tree_node_rule_key" property="treeRootRuleKey"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <select id="queryRuleTreeByTreeId" resultType="com.alepi.infrastructure.persistent.po.RuleTree" resultMap="dataMap">
         select * from rule_tree where tree_id = #{treeId}
     </select>
 </mapper>

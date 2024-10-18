@@ -2,11 +2,8 @@ package com.alepi.domain.strategy.service;
 
 import com.alepi.domain.strategy.model.entity.RaffleAwardEntity;
 import com.alepi.domain.strategy.model.entity.RaffleFactorEntity;
-import com.alepi.domain.strategy.model.entity.RuleActionEntity;
-import com.alepi.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
 import com.alepi.domain.strategy.service.armory.IStrategyDispatch;
-import com.alepi.domain.strategy.service.rule.chain.ILogicChain;
 import com.alepi.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
 import com.alepi.domain.strategy.service.rule.tree.factory.DefaultTreeFactory;
 import com.alepi.types.enums.ResponseCode;
@@ -19,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 
 @Slf4j
-public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
+public abstract class AbstractRaffleStrategy implements IRaffleStrategy, IRaffleStock {
 
     protected IStrategyRepository strategyRepository;
 

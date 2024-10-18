@@ -4,6 +4,7 @@ import com.alepi.domain.strategy.model.entity.StrategyAwardEntity;
 import com.alepi.domain.strategy.model.entity.StrategyEntity;
 import com.alepi.domain.strategy.model.entity.StrategyRuleEntity;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
+import com.alepi.types.common.Constants;
 import com.alepi.types.enums.ResponseCode;
 import com.alepi.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,14 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
     public boolean assembleLotteryStrategy(Long strategyId) {
         List<StrategyAwardEntity> strategyAwardEntities = strategyRepository.queryStrategyAwardList(strategyId);
 
+        // 缓存奖品库存-用于库存扣减
+        for (StrategyAwardEntity strategyAward : strategyAwardEntities) {
+            Integer awardId = strategyAward.getAwardId();
+            Integer awardCount = strategyAward.getAwardCountSurplus();
+            cacheStrategyAwardCount(strategyId, awardId, awardCount);
+        }
+
+        // 默认策略装配
         assembleLotteryStrategy(String.valueOf(strategyId), strategyAwardEntities);
 
         // 查询策略规则并配置规则
@@ -59,6 +68,11 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
         }
 
         return true;
+    }
+
+    private void cacheStrategyAwardCount(Long strategyId, Integer awardId, Integer awardCount) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
+        strategyRepository.cacheStrategyAwardCount(cacheKey,awardCount);
     }
 
     /**
@@ -139,5 +153,11 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
     public Integer getRandomAwardId(Long strategyId, String ruleWeightValue) {
         int rateRange = strategyRepository.getRateRange(String.valueOf(strategyId).concat("_").concat(ruleWeightValue));
         return strategyRepository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
+    }
+
+    @Override
+    public Boolean subtractionAwardStock(Long strategyId, Integer awardId) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
+        return strategyRepository.subtractionAwardStock(cacheKey);
     }
 }

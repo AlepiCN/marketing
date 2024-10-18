@@ -2,6 +2,7 @@ package com.alepi.domain.strategy.service.raffle;
 
 import com.alepi.domain.strategy.model.valobj.RuleTreeVO;
 import com.alepi.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
+import com.alepi.domain.strategy.model.valobj.StrategyAwardStockKeyVO;
 import com.alepi.domain.strategy.repository.IStrategyRepository;
 import com.alepi.domain.strategy.service.AbstractRaffleStrategy;
 import com.alepi.domain.strategy.service.armory.IStrategyDispatch;
@@ -42,5 +43,15 @@ public class DefaultRaffleStrategy extends AbstractRaffleStrategy {
 
         IDecisionTreeEngine treeEngine = defaultTreeFactory.openLogicTree(ruleTreeVO);
         return treeEngine.process(userId, strategyId, awardId);
+    }
+
+    @Override
+    public StrategyAwardStockKeyVO takeQueueValue() {
+        return strategyRepository.takeQueueValue();
+    }
+
+    @Override
+    public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
+        strategyRepository.updateStrategyAwardStock(strategyId, awardId);
     }
 }
