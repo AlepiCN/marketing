@@ -1,4 +1,4 @@
-package com.alepi.domain.strategy.model.entity;
+package com.alepi.trigger.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,17 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 抽奖因子
+ * 抽奖奖品列表，响应对象
  */
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class RaffleAwardEntity {
+@AllArgsConstructor
+public class RaffleAwardListResponseDTO {
 
     private Integer awardId;
-    // 奖品配置信息
-    private String awardConfig;
+
+    private String awardTitle;
+
+    private String awardSubtitle;
 
     private Integer sort;
 }

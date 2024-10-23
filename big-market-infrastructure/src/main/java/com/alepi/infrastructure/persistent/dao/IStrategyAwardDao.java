@@ -13,4 +13,6 @@ public interface IStrategyAwardDao {
     String queryStrategyAwardRuleModels(Long strategyId, Integer awardId);
 
     void updateStrategyAwardStock(Long strategyId, Integer awardId);
+
+    StrategyAward queryStrategyAward(Long strategyId, Integer awardId);
 }

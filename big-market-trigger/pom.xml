@@ -36,6 +36,11 @@
             <groupId>com.alepi</groupId>
             <artifactId>big-market-domain</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.alepi</groupId>
+            <artifactId>big-market-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

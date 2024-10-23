@@ -9,6 +9,7 @@ import com.alepi.infrastructure.persistent.dao.*;
 import com.alepi.infrastructure.persistent.po.*;
 import com.alepi.infrastructure.persistent.redis.IRedisService;
 import com.alepi.types.common.Constants;
+import com.alepi.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RDelayedQueue;
@@ -20,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.alepi.types.enums.ResponseCode.UN_ASSEMBLED_STRATEGY_ARMORY;
 
 @Slf4j
 @Service
@@ -43,7 +46,7 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId) {
 
-        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_KEY + strategyId;
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_LIST_KEY + strategyId;
 
         List<StrategyAwardEntity> strategyAwardEntities = redisService.getValue(cacheKey);
 
@@ -55,12 +58,15 @@ public class StrategyRepository implements IStrategyRepository {
 
         for (StrategyAward strategyAward : list) {
             StrategyAwardEntity strategyAwardEntity = StrategyAwardEntity.builder()
-                        .strategyId(strategyAward.getStrategyId())
-                        .awardId(strategyAward.getAwardId())
-                        .awardCount(strategyAward.getAwardCount())
-                        .awardCountSurplus(strategyAward.getAwardCountSurplus())
-                        .awardRate(strategyAward.getAwardRate())
-                        .build();
+                    .strategyId(strategyAward.getStrategyId())
+                    .awardId(strategyAward.getAwardId())
+                    .awardCount(strategyAward.getAwardCount())
+                    .awardCountSurplus(strategyAward.getAwardCountSurplus())
+                    .awardRate(strategyAward.getAwardRate())
+                    .sort(strategyAward.getSort())
+                    .awardTitle(strategyAward.getAwardTitle())
+                    .awardSubtitle(strategyAward.getAwardSubtitle())
+                    .build();
             strategyAwardEntities.add(strategyAwardEntity);
         }
 
@@ -81,6 +87,10 @@ public class StrategyRepository implements IStrategyRepository {
 
     @Override
     public int getRateRange(String strategyId) {
+        String cacheKey = Constants.RedisKey.STRATEGY_RATE_RANGE_KEY + strategyId;
+        if (!redisService.isExists(cacheKey)) {
+            throw new AppException(UN_ASSEMBLED_STRATEGY_ARMORY.getCode(), cacheKey + Constants.COLON + UN_ASSEMBLED_STRATEGY_ARMORY.getInfo());
+        }
         return redisService.getValue(Constants.RedisKey.STRATEGY_RATE_RANGE_KEY + strategyId);
     }
 
@@ -220,5 +230,28 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
         strategyAwardDao.updateStrategyAwardStock(strategyId, awardId);
+    }
+
+    @Override
+    public StrategyAwardEntity queryStrategyAwardEntity(Long strategyId, Integer awardId) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_LIST_KEY + strategyId + Constants.UNDERLINE + awardId;
+        StrategyAwardEntity value = redisService.getValue(cacheKey);
+        if (value != null) return value;
+
+        StrategyAward strategyAward = strategyAwardDao.queryStrategyAward(strategyId, awardId);
+
+        value = StrategyAwardEntity.builder()
+                .strategyId(strategyId)
+                .awardId(strategyAward.getAwardId())
+                .awardTitle(strategyAward.getAwardTitle())
+                .awardSubtitle(strategyAward.getAwardSubtitle())
+                .awardRate(strategyAward.getAwardRate())
+                .awardCount(strategyAward.getAwardCount())
+                .awardCountSurplus(strategyAward.getAwardCountSurplus())
+                .sort(strategyAward.getSort())
+                .build();
+
+        redisService.setValue(cacheKey, value);
+        return value;
     }
 }
