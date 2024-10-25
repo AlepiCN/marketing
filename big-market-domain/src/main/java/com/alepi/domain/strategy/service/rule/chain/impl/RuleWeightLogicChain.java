@@ -8,6 +8,7 @@ import com.alepi.domain.strategy.service.rule.chain.AbstractLogicChain;
 import com.alepi.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
 import com.alepi.types.common.Constants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -33,6 +34,11 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
     public DefaultChainFactory.StrategyAwardVO logic(String userId, Long strategyId) {
         log.info("抽奖责任链-权重开始 userId: {}, strategyId: {}, ruleModel: {}", userId, strategyId, ruleModel());
         String ruleValue = strategyRepository.queryStrategyRuleValue(strategyId, ruleModel());
+
+        if (StringUtils.isBlank(ruleValue)) {
+            log.info("抽奖责任链-权重放行 userId: {}, strategyId: {}, ruleModel: {}", userId, strategyId, ruleModel());
+            return next().logic(userId, strategyId);
+        }
 
         Map<Long, String> ruleValueMap = getAnalyticalValue(ruleValue);
         if (ruleValueMap == null || ruleValueMap.isEmpty()) return null;

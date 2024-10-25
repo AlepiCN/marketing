@@ -33,4 +33,11 @@ public interface IRaffleService {
      * @return 抽奖结果
      */
     Response<RaffleResponseDTO> randomRaffle(RaffleRequestDTO requestDTO);
+
+    /**
+     * 十连抽
+     * @param requestDTO 请求参数
+     * @return 抽奖结果
+     */
+    Response<List<RaffleResponseDTO>> tenTimesRaffle(RaffleRequestDTO requestDTO);
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin("${app.config.cross-origin}")
@@ -111,6 +112,37 @@ public class IRaffleController implements IRaffleService {
         } catch (Exception e) {
             log.info("随机抽奖失败 strategyId: {}", requestDTO.getStrategyId());
             return Response.<RaffleResponseDTO>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @RequestMapping(value = "ten_times_raffle", method = RequestMethod.POST)
+    @Override
+    public Response<List<RaffleResponseDTO>> tenTimesRaffle(@RequestBody RaffleRequestDTO requestDTO) {
+        try {
+            log.info("十连抽开始 strategyId: {}", requestDTO.getStrategyId());
+            List<RaffleAwardEntity> raffleAwardEntities = raffleStrategy.tenTimesRaffle(RaffleFactorEntity.builder()
+                    .strategyId(requestDTO.getStrategyId())
+                    .userId("system")
+                    .build());
+
+            List<RaffleResponseDTO> result = raffleAwardEntities.stream().map(o -> RaffleResponseDTO.builder()
+                    .awardId(o.getAwardId())
+                    .awardIndex(o.getSort())
+                    .build()).collect(Collectors.toList());
+
+            Response<List<RaffleResponseDTO>> response = Response.<List<RaffleResponseDTO>>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(result)
+                    .build();
+            log.info("十连抽完成 strategyId: {} response: {}", requestDTO.getStrategyId(), response);
+            return response;
+        } catch (Exception e) {
+            log.info("十连抽失败 strategyId: {}", requestDTO.getStrategyId());
+            return Response.<List<RaffleResponseDTO>>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(ResponseCode.UN_ERROR.getInfo())
                     .build();

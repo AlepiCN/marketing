@@ -12,6 +12,9 @@ import com.alepi.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 抽奖策略抽象类
  */
@@ -52,6 +55,16 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
         log.info("抽奖策略计算-规则树 {} {} {} {}", userId, strategyId, strategyAwardVO.getAwardId(), treeStrategyAwardVO.getAwardRuleValue());
 
         return buildRaffleAwardEntity(strategyId, treeStrategyAwardVO.getAwardId(), treeStrategyAwardVO.getAwardRuleValue());
+    }
+
+    @Override
+    public List<RaffleAwardEntity> tenTimesRaffle(RaffleFactorEntity raffleFactorEntity) {
+        List<RaffleAwardEntity> result = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            RaffleAwardEntity raffleAwardEntity = performRaffle(raffleFactorEntity);
+            result.add(raffleAwardEntity);
+        }
+        return result;
     }
 
     private RaffleAwardEntity buildRaffleAwardEntity(Long strategyId, Integer awardId, String awardConfig) {
