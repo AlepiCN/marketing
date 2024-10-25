@@ -116,7 +116,10 @@ public class StrategyRepository implements IStrategyRepository {
 
     @Override
     public StrategyRuleEntity queryStrategyRuleEntity(Long strategyId, String ruleModel) {
-        StrategyRule strategyRule = strategyRuleDao.queryStrategyRule(strategyId, ruleModel);
+        StrategyRule strategyRuleReq = new StrategyRule();
+        strategyRuleReq.setStrategyId(strategyId.intValue());
+        strategyRuleReq.setRuleModel(ruleModel);
+        StrategyRule strategyRule = strategyRuleDao.queryStrategyRule(strategyRuleReq);
         return StrategyRuleEntity.builder()
                 .ruleDesc(strategyRule.getRuleDesc())
                 .ruleModel(strategyRule.getRuleModel())
@@ -129,17 +132,28 @@ public class StrategyRepository implements IStrategyRepository {
 
     @Override
     public String queryStrategyRuleValue(Long strategyId, String ruleModel) {
-        return strategyRuleDao.queryStrategyRuleValue(strategyId, null, ruleModel);
+        StrategyRule strategyRule = new StrategyRule();
+        strategyRule.setId(strategyId);
+        strategyRule.setRuleModel(ruleModel);
+        return strategyRuleDao.queryStrategyRuleValue(strategyRule);
     }
 
     @Override
     public String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel) {
-        return strategyRuleDao.queryStrategyRuleValue(strategyId, awardId, ruleModel);
+        StrategyRule strategyRule = new StrategyRule();
+        strategyRule.setId(strategyId);
+        strategyRule.setAwardId(awardId);
+        strategyRule.setRuleModel(ruleModel);
+        return strategyRuleDao.queryStrategyRuleValue(strategyRule);
     }
 
     @Override
     public StrategyAwardRuleModelVO queryStrategyAwardRuleModel(Long strategyId, Integer awardId) {
-        String ruleModels = strategyAwardDao.queryStrategyAwardRuleModels(strategyId, awardId);
+        StrategyAward strategyAward = new StrategyAward();
+        strategyAward.setStrategyId(strategyId);
+        strategyAward.setAwardId(awardId);
+
+        String ruleModels = strategyAwardDao.queryStrategyAwardRuleModels(strategyAward);
         return StrategyAwardRuleModelVO.builder().ruleModels(ruleModels).build();
     }
 
@@ -229,7 +243,10 @@ public class StrategyRepository implements IStrategyRepository {
 
     @Override
     public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
-        strategyAwardDao.updateStrategyAwardStock(strategyId, awardId);
+        StrategyAward strategyAward = new StrategyAward();
+        strategyAward.setStrategyId(strategyId);
+        strategyAward.setAwardId(awardId);
+        strategyAwardDao.updateStrategyAwardStock(strategyAward);
     }
 
     @Override
@@ -238,17 +255,20 @@ public class StrategyRepository implements IStrategyRepository {
         StrategyAwardEntity value = redisService.getValue(cacheKey);
         if (value != null) return value;
 
-        StrategyAward strategyAward = strategyAwardDao.queryStrategyAward(strategyId, awardId);
+        StrategyAward strategyAward = new StrategyAward();
+        strategyAward.setStrategyId(strategyId);
+        strategyAward.setAwardId(awardId);
+        StrategyAward strategyAwardRes = strategyAwardDao.queryStrategyAward(strategyAward);
 
         value = StrategyAwardEntity.builder()
-                .strategyId(strategyId)
-                .awardId(strategyAward.getAwardId())
-                .awardTitle(strategyAward.getAwardTitle())
-                .awardSubtitle(strategyAward.getAwardSubtitle())
-                .awardRate(strategyAward.getAwardRate())
-                .awardCount(strategyAward.getAwardCount())
-                .awardCountSurplus(strategyAward.getAwardCountSurplus())
-                .sort(strategyAward.getSort())
+                .strategyId(strategyAwardRes.getStrategyId())
+                .awardId(strategyAwardRes.getAwardId())
+                .awardTitle(strategyAwardRes.getAwardTitle())
+                .awardSubtitle(strategyAwardRes.getAwardSubtitle())
+                .awardRate(strategyAwardRes.getAwardRate())
+                .awardCount(strategyAwardRes.getAwardCount())
+                .awardCountSurplus(strategyAwardRes.getAwardCountSurplus())
+                .sort(strategyAwardRes.getSort())
                 .build();
 
         redisService.setValue(cacheKey, value);
