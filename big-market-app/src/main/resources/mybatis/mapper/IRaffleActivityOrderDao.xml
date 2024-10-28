@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alepi.infrastructure.persistent.dao.IRaffleActivityOrderDao">
+
+    <resultMap id="dataMap" type="com.alepi.infrastructure.persistent.po.RaffleActivityOrder">
+            <id property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="activityId" column="activity_id"/>
+            <result property="activityName" column="activity_name"/>
+            <result property="strategyId" column="strategy_id"/>
+            <result property="orderId" column="order_id"/>
+            <result property="orderTime" column="order_time"/>
+            <result property="state" column="state"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+</mapper>
