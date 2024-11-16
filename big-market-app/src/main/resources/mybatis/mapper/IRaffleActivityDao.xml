@@ -11,16 +11,17 @@
             <result property="activityDesc" column="activity_desc"/>
             <result property="beginDateTime" column="begin_date_time"/>
             <result property="endDateTime" column="end_date_time"/>
-            <result property="stockCount" column="stock_count"/>
-            <result property="stockCountSurplus" column="stock_count_surplus"/>
-            <result property="activityCountId" column="activity_count_id"/>
             <result property="strategyId" column="strategy_id"/>
             <result property="state" column="state"/>
             <result property="createTime" column="create_time"/>
             <result property="updateTime" column="update_time"/>
     </resultMap>
-        <select id="findAll" resultType="com.alepi.infrastructure.persistent.po.RaffleActivity" resultMap="dataMap">
-                select * from raffle_activity
-        </select>
+
+    <select id="queryRaffleActivityByActivityId"
+            resultType="com.alepi.infrastructure.persistent.po.RaffleActivity">
+        select activityId, activityName, activityDesc, beginDateTime, endDateTime, strategyId, state
+        from raffle_activity
+        where activity_id = #{activityId}
+    </select>
 
 </mapper>

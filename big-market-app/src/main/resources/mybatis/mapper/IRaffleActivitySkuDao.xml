@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alepi.infrastructure.persistent.dao.IRaffleActivitySkuDao">
+
+    <resultMap id="dataMap" type="com.alepi.infrastructure.persistent.po.RaffleActivitySku">
+        <id property="id" column="id"/>
+        <result property="sku" column="sku"/>
+        <result property="activityId" column="activity_id"/>
+        <result property="activityCountId" column="activity_count_id"/>
+        <result property="stockCount" column="stock_count"/>
+        <result property="stockCountSurplus" column="stock_count_surplus"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <select id="queryActivitySku" resultType="com.alepi.infrastructure.persistent.po.RaffleActivitySku">
+        select sku, activityId, activityCountId, stockCount, stockCountSurplus
+        from raffle_activity_sku
+        where sku = #{sku}
+    </select>
+
+</mapper>
